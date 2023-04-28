@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic.base import View
 from django.contrib.auth.hashers import make_password
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.http import HttpResponseRedirect, HttpResponse,JsonResponse
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -29,7 +29,6 @@ class IndexView(View):
     """
     首页
     """
-
     def get(self, request):
         # banner
         banners = Banner.objects.all()
@@ -66,10 +65,10 @@ class IndexView(View):
 
 
 class RegisterView(View):
+
     """
     注册
     """
-
     def get(self, request):
         register_form = RegisterForm()
         hashkey = CaptchaStore.generate_key()
@@ -99,13 +98,13 @@ class RegisterView(View):
 
             send_register_email(user_name)
 
-            # return render(request, 'login.html')
+            #return render(request, 'login.html')
             messages.add_message(request, messages.SUCCESS, '注册成功！请在邮箱中点击激活链接激活账号！')
             return render(request, 'register.html', {})
         else:
             hashkey = CaptchaStore.generate_key()
             image_url = captcha_image_url(hashkey)
-            return render(request, 'register.html', {
+            return render(request, 'register.html',{
                 'register_form': register_form,
                 'hashkey': hashkey,
                 'image_url': image_url})
@@ -115,7 +114,6 @@ class ActiveView(View):
     """
     激活
     """
-
     def get(self, request, active_code):
         all_records = EmailVerifyRecord.objects.filter(send_type='register', code=active_code)
         if all_records:
@@ -129,7 +127,6 @@ class ActiveView(View):
 
 class LoginView(View):
     """登陆"""
-
     def get(self, request):
         return render(request, 'login.html', {})
 
@@ -158,7 +155,6 @@ class LogoutView(View):
     """
     退出
     """
-
     def get(self, request):
         logout(request)
         return HttpResponseRedirect(reverse('index'))
@@ -168,7 +164,6 @@ class ForgetPwdView(View):
     """
     忘记密码
     """
-
     def get(self, request):
         forget_form = ForgetForm()
         hashkey = CaptchaStore.generate_key()
@@ -202,7 +197,6 @@ class ForgetPwdView(View):
 
 class ResetView(View):
     """找回密码页面"""
-
     def get(self, request, find_code):
         all_records = EmailVerifyRecord.objects.filter(send_type='find', code=find_code)
         if all_records:
@@ -217,7 +211,6 @@ class NewPwdView(View):
     """
     修改用户密码
     """
-
     def post(self, request):
         newpwd_form = NewPwdForm(request.POST)
         if newpwd_form.is_valid():
@@ -245,7 +238,6 @@ class CheckView(View):
     """
     签到
     """
-
     def post(self, request):
         username = request.POST['user']
         user = MyUser.objects.filter(username=username)
@@ -255,7 +247,7 @@ class CheckView(View):
                 now_user.integral += 20
                 now_user.check_time = now
                 now_user.save()
-                result = json.dumps({"status": "success", "msg": "签到成功"}, ensure_ascii=False)
+                result = json.dumps({"status":"success", "msg":"签到成功"}, ensure_ascii=False)
             else:
                 result = json.dumps({"status": "fail", "msg": "签到失败，今天已经签过了"}, ensure_ascii=False)
             return HttpResponse(result)
@@ -265,7 +257,6 @@ class ProvinceView(View):
     """
     获得所有省
     """
-
     def get(self, requset):
         pros = AreaInfo.objects.filter(Parent=0)
         pro_list = []
@@ -278,7 +269,6 @@ class CityView(View):
     """
     获得所有市
     """
-
     def get(self, requset, pid):
         print(pid)
         citys = AreaInfo.objects.filter(Parent=pid)
@@ -292,7 +282,6 @@ class CountyView(View):
     """
     获得所有区/县
     """
-
     def get(self, requset, pid):
         countys = AreaInfo.objects.filter(Parent=pid)
         county_list = []
@@ -305,7 +294,6 @@ class UserInfoView(View):
     """
     个人信息页面
     """
-
     def get(self, request, info_type):
         if info_type == 'info':
             city_id = request.user.city_addr
@@ -315,12 +303,10 @@ class UserInfoView(View):
             user_city = city.values('title', 'Parent')[0]
             prov = AreaInfo.objects.filter(id=user_city['Parent'])
             user_prov = prov.values('title')[0]
-
             return render(request, 'my_info.html', {
                 'user_prov': user_prov['title'],
                 'user_city': user_city['title'],
                 'user_coun': user_coun['title'],
-
                 'info_type': 'info',
             })
 
@@ -333,13 +319,11 @@ class UserInfoView(View):
             user_all_contact = TheContact.objects.filter(user=request.user).order_by('-is_default', '-id')
             alreadycount = user_all_contact.count()
             remainingcount = 10 - user_all_contact.count()
-
             all_contacts = []
             for contact in user_all_contact:
                 cont = {}
                 cont['id'] = contact.id
                 cont['name'] = contact.name
-
                 city_id = contact.city_addr
                 coun = AreaInfo.objects.filter(id=int(city_id))
                 coutact_coun = coun.values('title', 'Parent')[0]
@@ -347,21 +331,18 @@ class UserInfoView(View):
                 coutact_city = city.values('title', 'Parent')[0]
                 prov = AreaInfo.objects.filter(id=coutact_city['Parent'])
                 coutact_prov = prov.values('title')[0]
-
                 cont['city'] = coutact_prov['title'] + ' ' + coutact_city['title'] + ' ' + coutact_coun['title']
                 cont['address'] = contact.address
                 cont['zip_code'] = contact.zip_code
                 cont['mobile'] = contact.mobile
                 cont['is_default'] = contact.is_default
                 all_contacts.append(cont)
-
             return render(request, 'my_contact.html', {
                 'all_contacts': all_contacts,
                 'alreadycount': alreadycount,
                 'remainingcount': remainingcount,
                 'info_type': 'contact',
-            })
-
+                })
         else:
             return render(request, 'security.html', {
                 'info_type': 'security',
@@ -372,7 +353,6 @@ class SettingInfoView(View):
     """
     个人信息修改
     """
-
     def post(self, request, setting_type):
         if setting_type == 'info':
             info_form = InfoForm(request.POST, instance=request.user)
@@ -385,8 +365,6 @@ class SettingInfoView(View):
                 image_form.save()
 
         elif setting_type == 'contact':
-            contact_form = ContactForm(request.POST)
-            if contact_form.is_valid():
                 contact = TheContact()
                 all_contact = request.user.thecontact_set.all()
                 if all_contact.count() <= 10:
@@ -401,18 +379,19 @@ class SettingInfoView(View):
                     if not is_default:
                         contact.is_default = False
                     else:
+                        contact.is_default = True
                         for con in all_contact:
                             if con != contact:
                                 # 别的设为非默认联系人地址
                                 con.is_default = False
                                 con.save()
-                            else:
-                                # 给自己设为默认
-                                contact.is_default = True
+
+
                     contact.save()
-                    return HttpResponse("<script>window.alert(\"保存成功\");</script>")
                 else:
-                    return HttpResponse("<script>window.alert(\"联系人数量达到最大值\");</script>")
+                    print("联系人数量达到最大值")
+                    pass
+
         else:
             newpwd_form = InfoNewPwdForm(request.POST)
             if newpwd_form.is_valid():
@@ -436,34 +415,10 @@ class SettingInfoView(View):
         return HttpResponseRedirect(reverse('userinfo', kwargs={'info_type': setting_type}))
 
 
-class AddContactView(View):
-    """
-    添加联系人
-    """
-    def post(self, request):
-        contact_form = ContactForm(request.POST)
-        if contact_form.is_valid():
-            user_profile = TheContact()
-            user_profile.name = contact_form.name
-            user_profile.city_addr = contact_form.city_addr
-            user_profile.address = contact_form.address
-            user_profile.mobile = contact_form.mobile
-            user_profile.zip_code = contact_form.zip_code
-            user_profile.is_default = contact_form.is_default
-            if user_profile.is_default:
-                all_contact = request.user.thecontact_set.all()
-                for cont in all_contact:
-                    cont.is_default = False
-                    cont.save()
-            user_profile.save()
-            return HttpResponse("<script>window.alert(\"添加联系人成功！\");}</script>")
-
-
 class ModifyContactView(View):
     """
     修改联系人
     """
-
     def get(self, request, contact_id):
         contact = TheContact.objects.get(id=contact_id)
 
@@ -512,10 +467,10 @@ class ModifyContactView(View):
 
 
 class DeleteContactView(View):
+
     """
     删除联系人
     """
-
     def get(self, request, contact_id):
         contact = TheContact.objects.get(id=contact_id)
         contact.delete()
@@ -526,7 +481,6 @@ class DefaultContactView(View):
     """
     设置默认联系人
     """
-
     def get(self, request, contact_id):
         contact = TheContact.objects.get(id=contact_id)
         if contact.is_default:
@@ -547,7 +501,6 @@ class MyCommentsView(View):
     """
     我的评论
     """
-
     def get(self, request):
         comments_type = request.GET.get('comments_type', '')
         if comments_type == 'note':
@@ -571,7 +524,6 @@ class MyCollectView(View):
     """
     我的收藏
     """
-
     def get(self, request):
         collects = UserCollect.objects.filter(user=request.user)
         return render(request, 'collection_list.html', {

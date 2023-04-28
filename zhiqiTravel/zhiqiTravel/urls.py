@@ -58,7 +58,7 @@ urlpatterns = [
     # 登出
     path('logout/', LogoutView.as_view(), name='logout'),
     # 忘记密码
-    path('forget_pwd/', ForgetPwdView.as_view(), name='forget_pwd'),
+    path('forget_pwd', ForgetPwdView.as_view(), name='forget_pwd'),
     # 找回密码页面
     path('find/<slug:find_code>', ResetView.as_view(), name='find'),
     # 修改密码
@@ -69,11 +69,7 @@ urlpatterns = [
     path('userinfo/<slug:info_type>', UserInfoView.as_view(), name='userinfo'),
     # 信息修改
     path('setting/<slug:setting_type>', SettingInfoView.as_view(), name='setting'),
-
-#添加联系人AddContactView
-
     # 联系人信息修改
-
     path('modify_contact/<int:contact_id>', ModifyContactView.as_view(), name='modify_contact'),
     # 联系人信息删除
     path('delete_contact/<int:contact_id>', DeleteContactView.as_view(), name='delete_contact'),
@@ -98,4 +94,3 @@ urlpatterns = [
     # static文件路径
     re_path(r'static/(?P<path>.*)$',serve,{"document_root": STATIC_ROOT}),
 ]
-

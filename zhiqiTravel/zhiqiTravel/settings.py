@@ -16,6 +16,7 @@ import sys
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
+sys.path.insert(0, os.path.join(BASE_DIR, 'static'))
 sys.path.insert(0, os.path.join(BASE_DIR, 'extra_apps'))
 
 # Quick-start development settings - unsuitable for production
@@ -25,7 +26,6 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'extra_apps'))
 SECRET_KEY = '3^g$b&1yb9e0#=ptnhhig-3qc@fhw^0!%audvzsbk#2o9al04v'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -155,7 +155,7 @@ MEDIA_DIRS = (
 # 更改验证码类型
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 
-
+DEBUG=True
 EMAIL_HOST = 'smtp.qq.com'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = '1533620467@qq.com'
