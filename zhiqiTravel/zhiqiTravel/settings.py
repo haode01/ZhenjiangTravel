@@ -155,7 +155,7 @@ MEDIA_DIRS = (
 # 更改验证码类型
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 
-DEBUG=True
+
 EMAIL_HOST = 'smtp.qq.com'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = '1533620467@qq.com'
